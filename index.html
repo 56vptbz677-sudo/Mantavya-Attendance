@@ -1,39 +1,274 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mantavya News Attendance</title>
-  <style>
-    body{margin:0;background:#111;color:white;font-family:Arial;text-align:center;padding:25px}
-    h1{color:#d6ad45}
-    .card{background:#222;padding:22px;border-radius:16px;margin-top:25px}
-    button{background:#d6ad45;color:#111;border:0;padding:15px 25px;border-radius:10px;font-size:17px;font-weight:bold;margin:10px}
-    video{width:100%;max-width:400px;border-radius:14px;background:#000}
-    #status{color:#d6ad45;margin:15px}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mantavya News Attendance</title>
+
+<script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101010;color:#fff;font-family:Arial,sans-serif}
+header{background:#191919;padding:22px;text-align:center;border-bottom:2px solid #c89b3c}
+header h1{margin:0;color:#d5ad50;font-size:25px}
+header p{font-size:11px;letter-spacing:3px;color:#aaa}
+main{max-width:520px;margin:auto;padding:18px}
+.card{background:#1d1d1d;border:1px solid #38332a;border-radius:15px;padding:20px;margin:15px 0}
+h2{color:#d5ad50;font-size:19px}
+input{width:100%;padding:14px;margin:8px 0;background:#292929;border:1px solid #555;color:white;border-radius:8px;font-size:16px}
+button{background:#c89b3c;color:#111;border:0;border-radius:9px;padding:14px;font-weight:bold;font-size:15px;margin:6px 0;cursor:pointer}
+button:disabled{opacity:.45}
+.full{width:100%}
+.actions{display:flex;gap:10px}
+.actions button{flex:1}
+video{width:100%;border-radius:12px;background:#000;max-height:320px}
+.muted{color:#aaa;font-size:13px}
+#app,#cameraCard{display:none}
+#status{color:#e5c36e;white-space:pre-wrap;font-size:13px}
+.record{border-bottom:1px solid #444;padding:10px 0;font-size:13px}
+</style>
 </head>
+
 <body>
-  <h1>MANTAVYA NEWS</h1>
-  <p>STAFF ATTENDANCE SYSTEM</p>
-  <div class="card">
-    <h3>Face Camera</h3>
-    <video id="camera" autoplay playsinline muted></video>
-    <br>
-    <button onclick="startCamera()">START CAMERA</button>
-    <p id="status">Camera not started</p>
-  </div>
+<header>
+<h1>MANTAVYA NEWS</h1>
+<p>STAFF ATTENDANCE SYSTEM</p>
+</header>
+
+<main>
+<section id="login" class="card">
+<h2>Employee Login</h2>
+<input id="employeeId" placeholder="Employee ID">
+<input id="password" type="password" placeholder="Password">
+<button class="full" onclick="login()">LOGIN</button>
+<p id="loginStatus" class="muted"></p>
+</section>
+
+<section id="app">
+<div class="card">
+<h2 id="welcome">Welcome</h2>
+<p id="employeeInfo" class="muted"></p>
+<button onclick="changePassword()" class="full">CHANGE PASSWORD</button>
+<button onclick="logout()" class="full">LOGOUT</button>
+</div>
+
+<div class="card">
+<h2>Face Verification</h2>
+<video id="video" autoplay muted playsinline></video>
+<button class="full" onclick="startCamera()">START CAMERA</button>
+<button class="full" onclick="registerFace()">REGISTER MY FACE</button>
+<p class="muted">Register your face before marking attendance.</p>
+</div>
+
+<div class="card">
+<h2>Office Location</h2>
+<p id="gpsStatus" class="muted">GPS not checked</p>
+<button class="full" onclick="checkGPS()">CHECK GPS</button>
+</div>
+
+<div class="card">
+<h2>Today's Attendance</h2>
+<div class="actions">
+<button onclick="markAttendance('IN')">MARK IN</button>
+<button onclick="markAttendance('OUT')">MARK OUT</button>
+</div>
+</div>
+
+<div class="card">
+<h2>My Attendance History</h2>
+<button class="full" onclick="loadHistory()">REFRESH HISTORY</button>
+<div id="history" class="muted"></div>
+</div>
+
+<div class="card" id="adminCard" style="display:none">
+<h2>Admin Dashboard</h2>
+<button class="full" onclick="loadAdmin()">LOAD ATTENDANCE REPORT</button>
+<div id="adminData"></div>
+</div>
+</section>
+
+<p id="status"></p>
+</main>
+
 <script>
-async function startCamera(){
-  const status=document.getElementById('status');
+const API="https://script.google.com/macros/s/AKfycbwoaP3AtRvqdGVeawPXyYJRdhuiRUG6PMy3zSMXL5TFvopps0vg3BLBhC8a29LamLnI/exec";
+const MODEL_URL="https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights";
+
+let token="",employee="",stream=null,gps=null,modelsReady=false;
+
+async function api(data){
+  const response=await fetch(API,{
+    method:"POST",
+    body:JSON.stringify(data)
+  });
+  return await response.json();
+}
+
+function showStatus(message){
+  document.getElementById("status").textContent=message;
+}
+
+async function login(){
+  const id=document.getElementById("employeeId").value.trim();
+  const pass=document.getElementById("password").value;
+  const el=document.getElementById("loginStatus");
+  el.textContent="Logging in...";
+
   try{
-    const stream=await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:'user'},audio:false
+    const r=await api({action:"login",employeeId:id,password:pass});
+    if(!r.success)throw new Error(r.message);
+
+    token=r.token;
+    employee=r.name;
+    document.getElementById("login").style.display="none";
+    document.getElementById("app").style.display="block";
+    document.getElementById("welcome").textContent="Welcome, "+employee;
+    document.getElementById("employeeInfo").textContent=r.employeeId;
+    if(r.isAdmin)document.getElementById("adminCard").style.display="block";
+
+    if(r.mustChangePassword){
+      alert("Please change your password.");
+      await changePassword();
+    }
+    loadHistory();
+  }catch(e){el.textContent=e.message}
+}
+
+async function changePassword(){
+  const oldPassword=prompt("Enter current password");
+  if(oldPassword===null)return;
+  const newPassword=prompt("Enter new password (minimum 8 characters)");
+  if(!newPassword)return;
+  try{
+    const r=await api({
+      action:"changePassword",
+      token,
+      oldPassword,
+      newPassword
     });
-    document.getElementById('camera').srcObject=stream;
-    status.textContent='Camera Started Successfully';
-  }catch(e){
-    status.textContent='Camera Error: '+e.message;
-  }
+    if(!r.success)throw new Error(r.message);
+    alert("Password changed successfully");
+  }catch(e){alert(e.message)}
+}
+
+async function logout(){
+  try{await api({action:"logout",token})}catch(e){}
+  if(stream)stream.getTracks().forEach(t=>t.stop());
+  token="";
+  location.reload();
+}
+
+async function startCamera(){
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:"user"},
+      audio:false
+    });
+    document.getElementById("video").srcObject=stream;
+    showStatus("Camera started. Loading face models...");
+    await loadModels();
+    showStatus("Camera and face models ready.");
+  }catch(e){showStatus("Camera error: "+e.message)}
+}
+
+async function loadModels(){
+  if(modelsReady)return;
+  await Promise.all([
+    faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+    faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+    faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+  ]);
+  modelsReady=true;
+}
+
+async function captureFace(){
+  if(!modelsReady)await loadModels();
+  const video=document.getElementById("video");
+  if(!video.srcObject)throw new Error("Start camera first");
+
+  const result=await faceapi
+    .detectSingleFace(video,new faceapi.TinyFaceDetectorOptions())
+    .withFaceLandmarks()
+    .withFaceDescriptor();
+
+  if(!result)throw new Error("Face not detected. Try again.");
+  return Array.from(result.descriptor);
+}
+
+async function registerFace(){
+  try{
+    const descriptor=await captureFace();
+    const r=await api({action:"registerFace",token,descriptor});
+    if(!r.success)throw new Error(r.message);
+    alert(r.message);
+  }catch(e){showStatus(e.message)}
+}
+
+async function checkGPS(){
+  const el=document.getElementById("gpsStatus");
+  el.textContent="Checking GPS...";
+  navigator.geolocation.getCurrentPosition(
+    p=>{
+      gps={lat:p.coords.latitude,lng:p.coords.longitude};
+      el.textContent="GPS location captured. Accuracy: "+Math.round(p.coords.accuracy)+"m";
+    },
+    e=>{el.textContent="GPS error: "+e.message},
+    {enableHighAccuracy:true,timeout:20000,maximumAge:0}
+  );
+}
+
+async function markAttendance(action){
+  try{
+    if(!gps)await new Promise((resolve,reject)=>{
+      navigator.geolocation.getCurrentPosition(
+        p=>{
+          gps={lat:p.coords.latitude,lng:p.coords.longitude};
+          resolve();
+        },
+        e=>reject(new Error(e.message)),
+        {enableHighAccuracy:true,timeout:20000}
+      );
+    });
+
+    showStatus("Verifying face...");
+    const descriptor=await captureFace();
+
+    const r=await api({
+      action:"attendance",
+      actionType:action,
+      token,
+      descriptor,
+      lat:gps.lat,
+      lng:gps.lng
+    });
+
+    if(!r.success)throw new Error(r.message);
+    showStatus(r.message+" at "+r.time);
+    loadHistory();
+  }catch(e){showStatus(e.message)}
+}
+
+async function loadHistory(){
+  try{
+    const r=await api({action:"myAttendance",token});
+    if(!r.success)throw new Error(r.message);
+    document.getElementById("history").innerHTML=
+      r.records.map(row=>
+        '<div class="record">'+row.join(" | ")+'</div>'
+      ).join("")||"No attendance records";
+  }catch(e){showStatus(e.message)}
+}
+
+async function loadAdmin(){
+  try{
+    const r=await api({action:"admin",token});
+    if(!r.success)throw new Error(r.message);
+    document.getElementById("adminData").innerHTML=
+      r.records.map(row=>
+        '<div class="record">'+row.join(" | ")+'</div>'
+      ).join("");
+  }catch(e){showStatus(e.message)}
 }
 </script>
 </body>
