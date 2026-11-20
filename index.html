@@ -1,1 +1,40 @@
-..
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mantavya News Attendance</title>
+  <style>
+    body{margin:0;background:#111;color:white;font-family:Arial;text-align:center;padding:25px}
+    h1{color:#d6ad45}
+    .card{background:#222;padding:22px;border-radius:16px;margin-top:25px}
+    button{background:#d6ad45;color:#111;border:0;padding:15px 25px;border-radius:10px;font-size:17px;font-weight:bold;margin:10px}
+    video{width:100%;max-width:400px;border-radius:14px;background:#000}
+    #status{color:#d6ad45;margin:15px}
+  </style>
+</head>
+<body>
+  <h1>MANTAVYA NEWS</h1>
+  <p>STAFF ATTENDANCE SYSTEM</p>
+  <div class="card">
+    <h3>Face Camera</h3>
+    <video id="camera" autoplay playsinline muted></video>
+    <br>
+    <button onclick="startCamera()">START CAMERA</button>
+    <p id="status">Camera not started</p>
+  </div>
+<script>
+async function startCamera(){
+  const status=document.getElementById('status');
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:'user'},audio:false
+    });
+    document.getElementById('camera').srcObject=stream;
+    status.textContent='Camera Started Successfully';
+  }catch(e){
+    status.textContent='Camera Error: '+e.message;
+  }
+}
+</script>
+</body>
+</html>
