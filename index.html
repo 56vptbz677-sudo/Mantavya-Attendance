@@ -426,10 +426,6 @@ function initAttendanceMap(){
   attribution:'&copy; OpenStreetMap contributors'
  }).addTo(attendanceMap);
 
- L.marker([OFFICE.lat,OFFICE.lng])
-  .addTo(attendanceMap)
-  .bindPopup("Mantavya News Office");
-
  officeCircle=L.circle(
   [OFFICE.lat,OFFICE.lng],
   {
