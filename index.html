@@ -3,45 +3,68 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#F7F3EA">
 <title>Mantavya News Attendance</title>
+
 <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#F7F3EA;color:#2B2B2B;font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif}
-header{background:#fff;padding:22px 16px;text-align:center;border-bottom:2px solid #C89B3C}
-header h1{margin:0;color:#2B2B2B;font-size:24px;letter-spacing:1px}
-header p{margin:6px 0 0;color:#A17B32;font-size:11px;letter-spacing:3px}
-main{max-width:520px;margin:auto;padding:16px}
-.card{background:#fff;border:1px solid #E9E1D2;border-radius:18px;padding:19px;margin:14px 0;box-shadow:0 4px 15px rgba(43,43,43,.05)}
-h2{font-size:18px;margin:0 0 15px;color:#2B2B2B}
-h3{font-size:14px;color:#887044;margin:0 0 8px}
-input{width:100%;padding:14px;margin:7px 0;background:#FAF9F6;border:1px solid #DDD4C2;color:#2B2B2B;border-radius:10px;font-size:16px}
-button{border:0;border-radius:11px;padding:14px;font-weight:700;font-size:14px;cursor:pointer;background:#C89B3C;color:#fff}
+body{
+ margin:0;background:#F7F3EA;color:#2B2B2B;
+ font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif
+}
+header{
+ background:#fff;padding:20px;text-align:center;
+ border-bottom:2px solid #C89B3C
+}
+header h1{margin:0;font-size:23px;letter-spacing:1px}
+header p{margin:5px 0 0;color:#A17B32;font-size:11px;letter-spacing:3px}
+main{max-width:520px;margin:auto;padding:14px}
+.card{
+ background:#fff;border:1px solid #E8E0D0;
+ border-radius:18px;padding:18px;margin:13px 0;
+ box-shadow:0 3px 14px rgba(43,43,43,.05)
+}
+h2{font-size:19px;margin:0 0 14px}
+h3{font-size:14px;color:#92702F}
+input{
+ width:100%;padding:14px;margin:7px 0;
+ border:1px solid #DDD4C2;border-radius:10px;
+ background:#FAF9F6;color:#2B2B2B;font-size:16px
+}
+button{
+ border:0;border-radius:11px;padding:14px;
+ font-size:14px;font-weight:700;cursor:pointer
+}
 button:disabled{opacity:.5}
 .full{width:100%}
-.actions{display:flex;gap:10px}
-.actions button{flex:1}
-.inbtn{background:#315D49}
-.outbtn{background:#8B4545}
-.secondary{background:#EFE9DC;color:#57482D}
-.toprow{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.gold{background:#C89B3C;color:white}
+.soft{background:#EFE9DC;color:#57482D}
+.inbtn{background:#315D49;color:white}
+.outbtn{background:#8B4545;color:white}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .timegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.timebox{background:#F7F3EA;border-radius:12px;padding:14px}
-.timebox strong{display:block;font-size:12px;color:#92702F;margin-bottom:7px}
-.timebox span{font-size:22px;font-weight:700;color:#2B2B2B}
-video{width:100%;max-height:320px;object-fit:cover;border-radius:13px;background:#eee}
+.timebox{background:#F7F3EA;padding:14px;border-radius:12px}
+.timebox strong{display:block;color:#92702F;font-size:12px}
+.timebox span{display:block;font-size:22px;font-weight:700;margin-top:7px}
+video{
+ width:100%;height:300px;object-fit:cover;
+ background:#eee;border-radius:13px;transform:scaleX(-1)
+}
+.status{font-size:13px;color:#806125;line-height:1.5;white-space:pre-wrap}
 .muted{font-size:13px;color:#777064;line-height:1.5}
-.status{font-size:13px;color:#806125;white-space:pre-wrap;line-height:1.5}
-.record{border-bottom:1px solid #E9E1D2;padding:12px 0;font-size:12px;overflow-wrap:anywhere}
-#app,#cameraCard,#profileCard,#adminCard{display:none}
-.pill{font-size:11px;padding:6px 10px;background:#F1E8D5;color:#806125;border-radius:20px}
+.record{padding:12px 0;border-bottom:1px solid #E9E1D2;font-size:13px}
+.pill{background:#F1E8D5;color:#806125;padding:6px 10px;border-radius:20px;font-size:11px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+#app,#profileCard,#adminCard{display:none}
 .nav{display:flex;gap:8px;margin:12px 0}
-.nav button{flex:1;padding:11px 5px;font-size:12px}
+.nav button{flex:1;padding:12px 5px;font-size:12px}
 </style>
 </head>
-<body>
 
+<body>
 <header>
 <h1>MANTAVYA NEWS</h1>
 <p>STAFF ATTENDANCE SYSTEM</p>
@@ -53,20 +76,21 @@ video{width:100%;max-height:320px;object-fit:cover;border-radius:13px;background
 <h2>Employee Login</h2>
 <input id="employeeId" placeholder="Employee ID" autocomplete="username">
 <input id="password" type="password" placeholder="Password" autocomplete="current-password">
-<button class="full" onclick="login()">LOGIN</button>
+<button class="full gold" onclick="login()">LOGIN</button>
 <p id="loginStatus" class="status"></p>
 </section>
 
 <section id="app">
 
 <div class="card">
-<div class="toprow">
+<div class="row">
 <div>
 <h2 id="welcome">Welcome</h2>
 <p id="employeeInfo" class="muted"></p>
 </div>
 <span class="pill">ATTENDANCE</span>
 </div>
+
 <div class="timegrid">
 <div class="timebox">
 <strong>IN TIME</strong>
@@ -80,66 +104,65 @@ video{width:100%;max-height:320px;object-fit:cover;border-radius:13px;background
 </div>
 
 <div class="card">
-<h2>Face Verification</h2>
-<div id="cameraPlaceholder" style="background:#F7F3EA;border-radius:13px;padding:35px 10px;text-align:center;color:#92702F">
-<strong>FACE SCAN</strong>
-<p class="muted">Position your face in the camera</p>
+<div class="row">
+<h2>Face & Attendance</h2>
+<span class="pill">FACE REQUIRED</span>
 </div>
-<video id="video" autoplay muted playsinline style="display:none"></video>
-<button class="full" onclick="startCamera()">START CAMERA</button>
-<button class="full secondary" onclick="scanFace()" style="margin-top:9px">SCAN FACE</button>
-<p id="faceStatus" class="status">Face scan required before attendance.</p>
+
+<video id="video" autoplay muted playsinline></video>
+
+<p id="faceStatus" class="status">Starting camera...</p>
+
+<button class="full soft" id="scanButton" onclick="scanFace()">SCAN FACE</button>
+
+<div class="actions" style="margin-top:13px">
+<button class="inbtn" id="inButton" onclick="markAttendance('IN')">MARK IN</button>
+<button class="outbtn" id="outButton" onclick="markAttendance('OUT')">MARK OUT</button>
+</div>
+
+<p class="muted">Face verification and office GPS are required before attendance.</p>
 </div>
 
 <div class="card">
-<h2>Mark Attendance</h2>
-<div class="actions">
-<button class="inbtn" onclick="markAttendance('IN')">MARK IN</button>
-<button class="outbtn" onclick="markAttendance('OUT')">MARK OUT</button>
-</div>
-<p class="muted">Face verification and office GPS are required.</p>
-</div>
-
-<div class="card">
-<div class="toprow">
+<div class="row">
 <h2>Office Location</h2>
 <span class="pill">100 METRES</span>
 </div>
 <p id="gpsStatus" class="muted">GPS not checked</p>
-<button class="full secondary" onclick="checkGPS()">CHECK GPS</button>
+<button class="full soft" onclick="checkGPS()">CHECK GPS</button>
 </div>
 
 <div class="card">
-<div class="toprow">
+<div class="row">
 <h2>Attendance History</h2>
-<button class="secondary" onclick="loadHistory()">REFRESH</button>
+<button class="soft" onclick="loadHistory()">REFRESH</button>
 </div>
 <div id="history" class="muted">No records loaded.</div>
 </div>
 
 <div class="nav">
-<button class="secondary" onclick="showProfile()">PROFILE</button>
-<button class="secondary" id="adminNav" onclick="showAdmin()" style="display:none">ADMIN</button>
-<button class="secondary" onclick="logout()">LOGOUT</button>
+<button class="soft" onclick="showProfile()">PROFILE</button>
+<button class="soft" id="adminNav" onclick="showAdmin()" style="display:none">ADMIN</button>
+<button class="soft" onclick="logout()">LOGOUT</button>
 </div>
 
 <section id="profileCard" class="card">
 <h2>Profile & Settings</h2>
-<p class="muted">Register or update your face here.</p>
-<button class="full" onclick="registerFace()">REGISTER MY FACE</button>
+<h3>Face Registration</h3>
+<button class="full gold" onclick="registerFace()">REGISTER / UPDATE FACE</button>
 <hr style="border:0;border-top:1px solid #E9E1D2;margin:18px 0">
 <h3>Change Password</h3>
 <input id="oldPassword" type="password" placeholder="Current password">
-<input id="newPassword" type="password" placeholder="New password (8+ characters)">
-<button class="full secondary" onclick="changePassword()">UPDATE PASSWORD</button>
-<button class="full secondary" style="margin-top:10px" onclick="hideSections()">CLOSE</button>
+<input id="newPassword" type="password" placeholder="New password">
+<button class="full soft" onclick="changePassword()">UPDATE PASSWORD</button>
+<button class="full soft" style="margin-top:10px" onclick="hideSections()">CLOSE</button>
 </section>
 
 <section id="adminCard" class="card">
 <h2>Admin Dashboard</h2>
-<button class="full" onclick="loadAdmin()">LOAD ATTENDANCE REPORT</button>
+<button class="full gold" onclick="loadAdmin()">LOAD REPORT</button>
 <div id="adminData"></div>
-<button class="full secondary" style="margin-top:10px" onclick="hideSections()">CLOSE</button>
+<button class="full soft" style="margin-top:10px" onclick="hideSections()">CLOSE</button>
 </section>
 
 </section>
@@ -157,6 +180,7 @@ let stream=null;
 let gps=null;
 let modelsReady=false;
 let faceVerified=false;
+let faceBusy=false;
 
 async function api(data){
  const response=await fetch(API,{
@@ -166,198 +190,344 @@ async function api(data){
  return await response.json();
 }
 
-function message(id,text){
- document.getElementById(id).textContent=text;
+function msg(id,value){
+ document.getElementById(id).textContent=value;
 }
 
 async function login(){
  const id=document.getElementById("employeeId").value.trim();
  const pass=document.getElementById("password").value;
- message("loginStatus","Logging in...");
+
+ msg("loginStatus","Logging in...");
+
  try{
-  const r=await api({action:"login",employeeId:id,password:pass});
+  const r=await api({
+   action:"login",
+   employeeId:id,
+   password:pass
+  });
+
   if(!r.success)throw new Error(r.message);
+
   token=r.token;
   employee=r.name;
+
   document.getElementById("login").style.display="none";
   document.getElementById("app").style.display="block";
   document.getElementById("welcome").textContent="Welcome, "+employee;
   document.getElementById("employeeInfo").textContent=r.employeeId;
-  if(r.isAdmin)document.getElementById("adminNav").style.display="block";
+
+  if(r.isAdmin){
+   document.getElementById("adminNav").style.display="block";
+  }
+
   loadHistory();
+
   if(r.mustChangePassword){
    alert("Please change your password in Profile.");
    showProfile();
   }
- }catch(e){message("loginStatus",e.message)}
+
+  startCamera();
+
+ }catch(e){
+  msg("loginStatus",e.message);
+ }
 }
 
 async function startCamera(){
  try{
+  msg("faceStatus","Opening front camera...");
+
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+   throw new Error("Camera not supported in this browser.");
+  }
+
   if(stream)stream.getTracks().forEach(t=>t.stop());
+
   stream=await navigator.mediaDevices.getUserMedia({
-   video:{facingMode:"user"},audio:false
+   audio:false,
+   video:{
+    facingMode:{ideal:"user"},
+    width:{ideal:640},
+    height:{ideal:480}
+   }
   });
+
   const video=document.getElementById("video");
   video.srcObject=stream;
-  video.style.display="block";
-  document.getElementById("cameraPlaceholder").style.display="none";
+  await video.play();
+
+  msg("faceStatus","Camera ready. Loading face recognition...");
+
   await loadModels();
-  faceVerified=false;
-  message("faceStatus","Camera ready. Press SCAN FACE.");
- }catch(e){message("faceStatus","Camera error: "+e.message)}
+
+  msg("faceStatus","Camera ready. Press SCAN FACE.");
+
+ }catch(e){
+  msg("faceStatus","Camera error: "+e.message+
+  ". Allow camera permission and refresh.");
+ }
 }
 
 async function loadModels(){
  if(modelsReady)return;
+
  await Promise.all([
   faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
   faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
   faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
  ]);
+
  modelsReady=true;
 }
 
 async function captureFace(){
- if(!stream)throw new Error("Please start camera first");
+ if(!stream)throw new Error("Camera is not ready.");
+
  await loadModels();
- const result=await faceapi.detectSingleFace(
-  document.getElementById("video"),
-  new faceapi.TinyFaceDetectorOptions()
- ).withFaceLandmarks().withFaceDescriptor();
- if(!result)throw new Error("Face not detected. Try again.");
+
+ const video=document.getElementById("video");
+
+ const result=await faceapi
+  .detectSingleFace(video,new faceapi.TinyFaceDetectorOptions())
+  .withFaceLandmarks()
+  .withFaceDescriptor();
+
+ if(!result)throw new Error("Face not detected. Look at camera.");
+
  return Array.from(result.descriptor);
 }
 
 async function scanFace(){
+ if(faceBusy)return;
+
+ faceBusy=true;
+ faceVerified=false;
+
+ const btn=document.getElementById("scanButton");
+ btn.disabled=true;
+
  try{
-  faceVerified=false;
-  message("faceStatus","Scanning face...");
+  msg("faceStatus","Scanning face...");
+
   const descriptor=await captureFace();
-  const r=await api({action:"verifyFace",token,descriptor});
+
+  const r=await api({
+   action:"verifyFace",
+   token:token,
+   descriptor:descriptor
+  });
+
   if(!r.success)throw new Error(r.message);
+
   faceVerified=true;
-  message("faceStatus","Face verified successfully.");
+  msg("faceStatus","Face verified successfully.");
+
  }catch(e){
-  message("faceStatus",e.message);
+  msg("faceStatus",e.message);
+ }finally{
+  btn.disabled=false;
+  faceBusy=false;
  }
 }
 
 async function registerFace(){
  try{
   const descriptor=await captureFace();
-  const r=await api({action:"registerFace",token,descriptor});
+
+  const r=await api({
+   action:"registerFace",
+   token:token,
+   descriptor:descriptor
+  });
+
   if(!r.success)throw new Error(r.message);
+
   faceVerified=true;
-  message("faceStatus","Face registration successful.");
+  msg("faceStatus","Face registered successfully.");
   alert("Face registered successfully.");
+
  }catch(e){
-  message("faceStatus",e.message);
+  msg("faceStatus",e.message);
  }
 }
 
+async function getGPS(){
+ return await new Promise((resolve,reject)=>{
+  navigator.geolocation.getCurrentPosition(
+   p=>resolve({
+    lat:p.coords.latitude,
+    lng:p.coords.longitude
+   }),
+   e=>reject(new Error("GPS error: "+e.message)),
+   {
+    enableHighAccuracy:true,
+    timeout:20000,
+    maximumAge:0
+   }
+  );
+ });
+}
+
 async function checkGPS(){
- message("gpsStatus","Checking GPS...");
- navigator.geolocation.getCurrentPosition(
-  p=>{
-   gps={lat:p.coords.latitude,lng:p.coords.longitude};
-   message("gpsStatus","GPS captured. Accuracy: "+Math.round(p.coords.accuracy)+"m");
-  },
-  e=>message("gpsStatus","GPS error: "+e.message),
-  {enableHighAccuracy:true,timeout:20000,maximumAge:0}
- );
+ try{
+  msg("gpsStatus","Checking GPS...");
+  gps=await getGPS();
+
+  msg("gpsStatus","GPS captured successfully.");
+ }catch(e){
+  msg("gpsStatus",e.message);
+ }
 }
 
 async function markAttendance(action){
+ const btn=document.getElementById(
+  action==="IN"?"inButton":"outButton"
+ );
+
  try{
-  if(!faceVerified)throw new Error("Please scan and verify your face first.");
-  if(!gps){
-   await new Promise((resolve,reject)=>{
-    navigator.geolocation.getCurrentPosition(
-     p=>{
-      gps={lat:p.coords.latitude,lng:p.coords.longitude};
-      resolve();
-     },
-     e=>reject(new Error("GPS error: "+e.message)),
-     {enableHighAccuracy:true,timeout:20000,maximumAge:0}
-    );
-   });
+  if(!faceVerified){
+   throw new Error("Please scan your face first.");
   }
+
+  btn.disabled=true;
+  msg("status","Checking GPS and verifying attendance...");
+
+  gps=await getGPS();
+
   const descriptor=await captureFace();
+
   const r=await api({
    action:"attendance",
    actionType:action,
-   token,
-   descriptor,
+   token:token,
+   descriptor:descriptor,
    lat:gps.lat,
    lng:gps.lng
   });
+
   if(!r.success)throw new Error(r.message);
+
   faceVerified=false;
-  message("status",r.message+" at "+r.time);
-  loadHistory();
- }catch(e){message("status",e.message)}
+
+  msg("status",r.message+" | "+r.time);
+
+  await loadHistory();
+
+  alert(action+" recorded successfully.");
+
+ }catch(e){
+  msg("status",e.message);
+ }finally{
+  btn.disabled=false;
+ }
 }
 
 async function loadHistory(){
  try{
-  const r=await api({action:"myAttendance",token});
+  const r=await api({
+   action:"myAttendance",
+   token:token
+  });
+
   if(!r.success)throw new Error(r.message);
+
   const box=document.getElementById("history");
   box.innerHTML="";
-  if(!r.records.length){box.textContent="No attendance records.";return}
+
+  if(!r.records || !r.records.length){
+   box.textContent="No attendance records.";
+   return;
+  }
+
   r.records.forEach(row=>{
    const div=document.createElement("div");
    div.className="record";
    div.textContent=row.join(" | ");
    box.appendChild(div);
   });
- }catch(e){message("status",e.message)}
+
+ }catch(e){
+  msg("status",e.message);
+ }
 }
 
 async function loadAdmin(){
  try{
-  const r=await api({action:"admin",token});
+  const r=await api({
+   action:"admin",
+   token:token
+  });
+
   if(!r.success)throw new Error(r.message);
+
   const box=document.getElementById("adminData");
   box.innerHTML="";
+
   r.records.forEach(row=>{
    const div=document.createElement("div");
    div.className="record";
    div.textContent=row.join(" | ");
    box.appendChild(div);
   });
- }catch(e){message("status",e.message)}
+
+ }catch(e){
+  msg("status",e.message);
+ }
 }
 
 async function changePassword(){
  try{
   const oldPassword=document.getElementById("oldPassword").value;
   const newPassword=document.getElementById("newPassword").value;
-  const r=await api({action:"changePassword",token,oldPassword,newPassword});
+
+  if(newPassword.length<8){
+   throw new Error("Password must be at least 8 characters.");
+  }
+
+  const r=await api({
+   action:"changePassword",
+   token:token,
+   oldPassword:oldPassword,
+   newPassword:newPassword
+  });
+
   if(!r.success)throw new Error(r.message);
+
   alert("Password changed successfully.");
   document.getElementById("oldPassword").value="";
   document.getElementById("newPassword").value="";
- }catch(e){alert(e.message)}
+
+ }catch(e){
+  alert(e.message);
+ }
 }
 
 function showProfile(){
  hideSections();
  document.getElementById("profileCard").style.display="block";
 }
+
 function showAdmin(){
  hideSections();
  document.getElementById("adminCard").style.display="block";
 }
+
 function hideSections(){
  document.getElementById("profileCard").style.display="none";
  document.getElementById("adminCard").style.display="none";
 }
 
 async function logout(){
- try{await api({action:"logout",token})}catch(e){}
- if(stream)stream.getTracks().forEach(t=>t.stop());
+ try{
+  await api({action:"logout",token:token});
+ }catch(e){}
+
+ if(stream){
+  stream.getTracks().forEach(t=>t.stop());
+ }
+
  location.reload();
 }
 </script>
