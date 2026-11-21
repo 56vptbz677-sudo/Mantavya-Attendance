@@ -3,229 +3,91 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mantavya News | Staff Attendance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#263B5A">
+<title>Mantavya News Attendance</title>
 
 <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <style>
-:root {
-  --bg:#F7F8FA;
-  --white:#FFFFFF;
-  --navy:#263B5A;
-  --text:#252B36;
-  --muted:#758195;
-  --green:#24845D;
-  --green-bg:#E8F5EE;
-  --red:#B84B4B;
-  --border:#E5E9F0;
-  --shadow:0 5px 20px rgba(35,49,70,.06);
+:root{
+ --bg:#F7F8FA;
+ --white:#FFFFFF;
+ --navy:#263B5A;
+ --text:#252B36;
+ --muted:#788397;
+ --green:#24845D;
+ --greenbg:#E8F5EE;
+ --red:#B84B4B;
+ --redbg:#FBECEC;
+ --border:#E5E9F0;
 }
-
-* {box-sizing:border-box}
-
-body {
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+*{box-sizing:border-box}
+body{
+ margin:0;background:var(--bg);color:var(--text);
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
 }
-
-header {
-  background:var(--white);
-  padding:18px 20px;
-  border-bottom:1px solid var(--border);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+header{
+ background:white;padding:17px 19px;border-bottom:1px solid var(--border);
+ display:flex;justify-content:space-between;align-items:center;
+ position:sticky;top:0;z-index:500;
 }
-
-.brand {
-  font-size:18px;
-  font-weight:800;
-  color:var(--navy);
+.brand{font-size:18px;font-weight:850;color:var(--navy)}
+.brand small{display:block;font-size:10px;letter-spacing:2px;color:var(--muted);margin-top:4px}
+.container{max-width:850px;margin:auto;padding:15px}
+.card{
+ background:white;border:1px solid var(--border);border-radius:17px;
+ padding:20px;margin-bottom:17px;
+ box-shadow:0 4px 18px rgba(30,45,65,.045);
 }
-
-.brand small {
-  display:block;
-  font-size:10px;
-  color:var(--muted);
-  letter-spacing:2px;
-  margin-top:4px;
+h2{font-size:20px;color:var(--navy);margin:0 0 14px}
+p{color:var(--muted);font-size:14px;line-height:1.55}
+.step{font-size:11px;letter-spacing:1.5px;color:var(--muted);font-weight:800;margin-bottom:11px}
+input{
+ width:100%;padding:14px;border:1px solid var(--border);
+ border-radius:10px;font-size:16px;margin:7px 0 13px;
 }
-
-.container {
-  max-width:850px;
-  margin:auto;
-  padding:18px;
+button{
+ border:0;border-radius:11px;padding:15px;
+ font-size:15px;font-weight:750;cursor:pointer;
 }
-
-.card {
-  background:var(--white);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:20px;
-  margin-bottom:17px;
-  box-shadow:var(--shadow);
+button:disabled{opacity:.5}
+.primary{background:var(--navy);color:white}
+.secondary{background:#EDF1F6;color:var(--navy)}
+.success{background:var(--green);color:white}
+.danger{background:var(--redbg);color:var(--red)}
+.full{width:100%}
+.row{display:flex;gap:12px}
+.row>*{flex:1;min-width:0}
+#map{height:270px;border-radius:12px;overflow:hidden;margin-top:13px}
+.status{
+ padding:12px;border-radius:10px;background:var(--greenbg);
+ color:var(--green);font-size:13px;line-height:1.5;margin-top:12px;
 }
-
-h2 {
-  font-size:18px;
-  margin:0 0 15px;
-  color:var(--navy);
+.status.error{background:var(--redbg);color:var(--red)}
+video{
+ width:100%;height:280px;object-fit:cover;background:#111;
+ border-radius:12px;margin:8px 0 13px;transform:scaleX(-1);
 }
-
-h3 {margin:0 0 8px}
-
-p {color:var(--muted);font-size:14px}
-
-.welcome {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+.timegrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.timebox{
+ background:#F7F8FA;border:1px solid var(--border);
+ border-radius:12px;padding:19px 8px;text-align:center;
 }
-
-.welcome h2 {margin:0}
-
-.step {
-  color:var(--muted);
-  font-size:12px;
-  margin-bottom:10px;
-  font-weight:700;
-  letter-spacing:1px;
-}
-
-input {
-  width:100%;
-  padding:13px;
-  border:1px solid var(--border);
-  border-radius:10px;
-  font-size:15px;
-  margin:7px 0 12px;
-  background:white;
-}
-
-button {
-  border:0;
-  border-radius:10px;
-  padding:13px 17px;
-  font-size:14px;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.primary {
-  background:var(--navy);
-  color:white;
-}
-
-.success {
-  background:var(--green);
-  color:white;
-}
-
-.secondary {
-  background:#EDF1F6;
-  color:var(--navy);
-}
-
-.danger {
-  background:#FBECEC;
-  color:var(--red);
-}
-
-button:disabled {
-  opacity:.5;
-  cursor:not-allowed;
-}
-
-.full {width:100%}
-
-#map {
-  height:260px;
-  border-radius:12px;
-  overflow:hidden;
-  margin-top:12px;
-}
-
-.status {
-  padding:12px;
-  border-radius:10px;
-  background:var(--green-bg);
-  color:var(--green);
-  font-size:13px;
-  margin-top:12px;
-}
-
-.status.error {
-  background:#FBECEC;
-  color:var(--red);
-}
-
-video {
-  width:100%;
-  max-height:300px;
-  object-fit:cover;
-  background:#111;
-  border-radius:12px;
-  margin:10px 0;
-}
-
-.time-grid {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-
-.time-box {
-  background:#F7F8FA;
-  border:1px solid var(--border);
-  padding:18px 10px;
-  text-align:center;
-  border-radius:12px;
-}
-
-.time-box small {
-  display:block;
-  color:var(--muted);
-  font-weight:700;
-  margin-bottom:10px;
-}
-
-.time-box strong {
-  color:var(--navy);
-  font-size:23px;
-}
-
-table {
-  width:100%;
-  border-collapse:collapse;
-  font-size:13px;
-}
-
-th,td {
-  padding:12px 7px;
-  border-bottom:1px solid var(--border);
-  text-align:left;
-}
-
-th {color:var(--muted)}
-
-.hidden {display:none!important}
-
-footer {
-  text-align:center;
-  padding:20px;
-  font-size:12px;
-  color:var(--muted);
-}
-
-@media(max-width:500px) {
-  .container {padding:12px}
-  .card {padding:16px}
-  .time-box strong {font-size:19px}
+.timebox small{display:block;color:var(--muted);font-size:12px;font-weight:800;margin-bottom:9px}
+.timebox strong{font-size:23px;color:var(--navy)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:12px 7px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:var(--muted)}
+.hidden{display:none!important}
+footer{text-align:center;padding:20px;color:var(--muted);font-size:12px}
+@media(max-width:430px){
+ .container{padding:12px}
+ .card{padding:16px}
+ video{height:240px}
+ .timebox strong{font-size:19px}
 }
 </style>
 </head>
@@ -233,383 +95,466 @@ footer {
 <body>
 
 <header>
-  <div class="brand">
-    MANTAVYA NEWS
-    <small>STAFF ATTENDANCE SYSTEM</small>
-  </div>
-  <button class="secondary" id="logoutBtn" onclick="logout()" hidden>Logout</button>
+ <div class="brand">MANTAVYA NEWS
+  <small>STAFF ATTENDANCE SYSTEM</small>
+ </div>
+ <button class="secondary" id="logoutBtn" onclick="logout()" hidden>Logout</button>
 </header>
 
-<div class="container">
+<main class="container">
 
 <!-- LOGIN -->
 <section class="card" id="loginSection">
-  <h2>Staff Login</h2>
-  <p>Login with your Employee ID and Password.</p>
-  <input id="employeeId" placeholder="Employee ID">
-  <input id="password" type="password" placeholder="Password">
-  <button class="primary full" onclick="login()">Login</button>
-  <div id="loginMessage"></div>
+ <h2>Staff Login</h2>
+ <p>Enter your Employee ID and Password to continue.</p>
+ <input id="employeeId" placeholder="Employee ID" autocomplete="username">
+ <input id="password" type="password" placeholder="Password" autocomplete="current-password">
+ <button class="primary full" id="loginButton" onclick="login()">LOGIN</button>
+ <div id="loginMessage"></div>
 </section>
 
-<!-- DASHBOARD -->
 <div id="dashboard" class="hidden">
 
 <!-- 1 WELCOME -->
-<section class="card welcome">
-  <div>
-    <div class="step">01 / WELCOME</div>
-    <h2>Welcome, <span id="staffName">Dhruv Padhiyar</span></h2>
-    <p>Mantavya News Staff Portal</p>
-  </div>
+<section class="card">
+ <div class="step">01 / WELCOME</div>
+ <h2>Welcome, <span id="staffName">Staff</span></h2>
+ <p>Mantavya News Staff Portal</p>
 </section>
 
 <!-- 2 OFFICE LOCATION -->
 <section class="card">
-  <div class="step">02 / OFFICE LOCATION</div>
-  <h2>Office Location</h2>
-  <p>Grand Dinner Bell Building, Ahmedabad</p>
-  <div class="time-box">
-    <small>OFFICE GPS RADIUS</small>
-    <strong>50 METRES</strong>
-  </div>
-  <div id="map"></div>
-  <div id="gpsStatus" class="status">Getting GPS location...</div>
-  <button class="secondary full" onclick="updateLocation()" style="margin-top:12px">Update Live Location</button>
+ <div class="step">02 / OFFICE LOCATION</div>
+ <h2>Office Location</h2>
+ <div class="timebox">
+  <small>OFFICE GPS RADIUS</small>
+  <strong>50 METRES</strong>
+ </div>
+ <div id="map"></div>
+ <div id="gpsStatus" class="status">Checking GPS location...</div>
+ <button class="secondary full" onclick="updateLocation()" style="margin-top:12px">
+  UPDATE LIVE LOCATION
+ </button>
 </section>
 
 <!-- 3 FACE & ATTENDANCE -->
 <section class="card">
-  <div class="step">03 / FACE & ATTENDANCE</div>
-  <h2>Face Verification</h2>
-  <video id="camera" autoplay muted playsinline></video>
-  <button class="secondary full" onclick="startCamera()">Start Camera</button>
-  <button class="primary full" onclick="scanFace()" style="margin-top:9px">Scan Face</button>
-  <div id="faceStatus" class="status">Face not verified</div>
+ <div class="step">03 / FACE & ATTENDANCE</div>
+ <h2>Face Verification</h2>
 
-  <div class="time-grid" style="margin-top:15px">
-    <button class="success" onclick="markAttendance('IN')">MARK IN</button>
-    <button class="danger" onclick="markAttendance('OUT')">MARK OUT</button>
-  </div>
-  <div id="attendanceStatus"></div>
+ <video id="camera" autoplay muted playsinline></video>
+
+ <button class="secondary full" id="registerButton" onclick="registerFace()">
+  REGISTER FACE
+ </button>
+
+ <button class="primary full" id="scanButton" onclick="scanFace()" style="margin-top:10px">
+  SCAN FACE
+ </button>
+
+ <div id="faceStatus" class="status">Camera will start after login.</div>
+
+ <div class="row" style="margin-top:15px">
+  <button class="success" onclick="markAttendance('IN')">MARK IN</button>
+  <button class="danger" onclick="markAttendance('OUT')">MARK OUT</button>
+ </div>
+ <div id="attendanceStatus"></div>
 </section>
 
-<!-- 4 TIME CARD -->
+<!-- 4 TIME -->
 <section class="card">
-  <div class="step">04 / TODAY'S TIME</div>
-  <h2>Attendance Time</h2>
-  <div class="time-grid">
-    <div class="time-box">
-      <small>IN TIME</small>
-      <strong id="inTime">--:--</strong>
-    </div>
-    <div class="time-box">
-      <small>OUT TIME</small>
-      <strong id="outTime">--:--</strong>
-    </div>
+ <div class="step">04 / TODAY'S TIME</div>
+ <h2>Attendance Time</h2>
+ <div class="timegrid">
+  <div class="timebox">
+   <small>IN TIME</small>
+   <strong id="inTime">--:--</strong>
   </div>
+  <div class="timebox">
+   <small>OUT TIME</small>
+   <strong id="outTime">--:--</strong>
+  </div>
+ </div>
 </section>
 
 <!-- 5 HISTORY -->
 <section class="card">
-  <div class="step">05 / ATTENDANCE HISTORY</div>
-  <h2>Attendance History</h2>
-  <div style="overflow-x:auto">
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>IN</th>
-          <th>OUT</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="historyBody">
-        <tr><td colspan="4">No records found</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <button class="secondary full" onclick="loadHistory()" style="margin-top:12px">Refresh History</button>
+ <div class="step">05 / ATTENDANCE HISTORY</div>
+ <h2>Attendance History</h2>
+ <div style="overflow-x:auto">
+  <table>
+   <thead>
+    <tr><th>Date</th><th>IN</th><th>OUT</th><th>Status</th></tr>
+   </thead>
+   <tbody id="historyBody">
+    <tr><td colspan="4">No records found</td></tr>
+   </tbody>
+  </table>
+ </div>
+ <button class="secondary full" onclick="loadHistory()" style="margin-top:13px">
+  REFRESH HISTORY
+ </button>
 </section>
 
 </div>
-</div>
+</main>
 
-<footer>Mantavya News © Staff Attendance</footer>
+<footer>Mantavya News © Staff Attendance System</footer>
 
 <script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbwoaP3AtRvqdGVeawPXyYJRdhuiRUG6PMy3zSMXL5TFvopps0vg3BLBhC8a29LamLnI/exec';
+const API_URL =
+'https://script.google.com/macros/s/AKfycbwoaP3AtRvqdGVeawPXyYJRdhuiRUG6PMy3zSMXL5TFvopps0vg3BLBhC8a29LamLnI/exec';
 
-const OFFICE = {
-  lat:23.045874,
-  lng:72.552455,
-  radius:50
+const OFFICE={
+ lat:23.045874,
+ lng:72.552455,
+ radius:50
 };
 
-let token = '';
-let faceVerified = false;
-let liveLat = null;
-let liveLng = null;
-let attendanceMap = null;
-let liveMarker = null;
-let officeCircle = null;
-let faceDescriptor = null;
+const MODEL_URL =
+'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights';
 
-async function api(data) {
-  const response = await fetch(API_URL,{
-    method:'POST',
-    headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify(data)
+let token='';
+let faceVerified=false;
+let faceDescriptor=null;
+let liveLat=null;
+let liveLng=null;
+let attendanceMap=null;
+let liveMarker=null;
+let modelsLoaded=false;
+let cameraStream=null;
+
+async function api(data){
+ const response=await fetch(API_URL,{
+  method:'POST',
+  headers:{'Content-Type':'text/plain;charset=utf-8'},
+  body:JSON.stringify(data)
+ });
+ return await response.json();
+}
+
+async function login(){
+ const button=document.getElementById('loginButton');
+ const message=document.getElementById('loginMessage');
+ button.disabled=true;
+ message.textContent='Logging in...';
+
+ try{
+  const result=await api({
+   action:'login',
+   employeeId:document.getElementById('employeeId').value.trim(),
+   password:document.getElementById('password').value
   });
-  return await response.json();
+
+  if(!result.success)throw new Error(result.message||'Login failed');
+
+  token=result.token;
+  document.getElementById('staffName').textContent=result.name;
+  document.getElementById('loginSection').classList.add('hidden');
+  document.getElementById('dashboard').classList.remove('hidden');
+  document.getElementById('logoutBtn').hidden=false;
+
+  initMap();
+  updateLocation();
+  loadToday();
+  loadHistory();
+
+  // Start camera automatically after login
+  startCamera();
+
+ }catch(error){
+  message.textContent=error.message;
+ }finally{
+  button.disabled=false;
+ }
 }
 
-async function login() {
-  const msg = document.getElementById('loginMessage');
-  msg.textContent = 'Logging in...';
-
-  try {
-    const result = await api({
-      action:'login',
-      employeeId:document.getElementById('employeeId').value,
-      password:document.getElementById('password').value
-    });
-
-    if(!result.success) throw new Error(result.message || 'Login failed');
-
-    token = result.token;
-    document.getElementById('loginSection').classList.add('hidden');
-    document.getElementById('dashboard').classList.remove('hidden');
-    document.getElementById('logoutBtn').hidden = false;
-    document.getElementById('staffName').textContent = result.name;
-
-    initMap();
-    updateLocation();
-    loadHistory();
-    loadToday();
-  } catch(e) {
-    msg.textContent = e.message;
-  }
+async function logout(){
+ try{
+  if(token)await api({action:'logout',token});
+ }catch(e){}
+ if(cameraStream)cameraStream.getTracks().forEach(track=>track.stop());
+ token='';
+ location.reload();
 }
 
-function logout() {
-  if(token) api({action:'logout',token});
-  token='';
+function initMap(){
+ if(attendanceMap)return;
+
+ attendanceMap=L.map('map').setView([OFFICE.lat,OFFICE.lng],18);
+
+ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  maxZoom:19,
+  attribution:'© OpenStreetMap contributors'
+ }).addTo(attendanceMap);
+
+ // Green 50m office area. No extra office pin.
+ L.circle([OFFICE.lat,OFFICE.lng],{
+  radius:OFFICE.radius,
+  color:'#24845D',
+  weight:2,
+  fillColor:'#24845D',
+  fillOpacity:.13
+ }).addTo(attendanceMap);
+
+ setTimeout(()=>attendanceMap.invalidateSize(),400);
+}
+
+function distanceMetres(a,b,c,d){
+ const R=6371000;
+ const rad=x=>x*Math.PI/180;
+ const v=Math.sin(rad(c-a)/2)**2+
+ Math.cos(rad(a)*Math.cos(rad(c))*Math.sin(rad(d-b)/2)**2;
+ return 2*R*Math.atan2(Math.sqrt(v),Math.sqrt(1-v));
+}
+
+function updateLocation(){
+ const status=document.getElementById('gpsStatus');
+ status.textContent='Getting live location...';
+
+ if(!navigator.geolocation){
+  showGpsError('GPS is not supported on this device.');
+  return;
+ }
+
+ navigator.geolocation.getCurrentPosition(position=>{
+  liveLat=position.coords.latitude;
+  liveLng=position.coords.longitude;
+
+  const distance=distanceMetres(
+   liveLat,liveLng,OFFICE.lat,OFFICE.lng
+  );
+
+  if(liveMarker)attendanceMap.removeLayer(liveMarker);
+
+  // Blue live location dot only
+  liveMarker=L.circleMarker([liveLat,liveLng],{
+   radius:8,
+   color:'#FFFFFF',
+   weight:2,
+   fillColor:'#2875D0',
+   fillOpacity:1
+  }).addTo(attendanceMap);
+
+  status.textContent=distance<=OFFICE.radius
+   ?'INSIDE 50 metre office zone • '+Math.round(distance)+'m'
+   :'OUTSIDE 50 metre office zone • '+Math.round(distance)+'m';
+
+  status.classList.toggle('error',distance>OFFICE.radius);
+
+ },error=>{
+  showGpsError('Unable to get GPS. Allow location access and try again.');
+ },{
+  enableHighAccuracy:true,
+  timeout:20000,
+  maximumAge:0
+ });
+}
+
+function showGpsError(message){
+ const status=document.getElementById('gpsStatus');
+ status.textContent=message;
+ status.classList.add('error');
+}
+
+async function startCamera(){
+ const video=document.getElementById('camera');
+ const status=document.getElementById('faceStatus');
+
+ try{
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)
+   throw new Error('Camera is not supported in this browser.');
+
+  cameraStream=await navigator.mediaDevices.getUserMedia({
+   video:{facingMode:'user'},
+   audio:false
+  });
+
+  video.srcObject=cameraStream;
+  await video.play();
+
+  status.textContent='Camera ready. Press REGISTER FACE or SCAN FACE.';
+  status.classList.remove('error');
+
+ }catch(error){
+  status.textContent='Camera permission denied or unavailable: '+error.message;
+  status.classList.add('error');
+ }
+}
+
+async function loadFaceModels(){
+ if(modelsLoaded)return;
+
+ await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+ await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+ await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+
+ modelsLoaded=true;
+}
+
+async function captureFace(){
+ await loadFaceModels();
+
+ const video=document.getElementById('camera');
+
+ if(!video.srcObject)throw new Error('Camera is not ready.');
+
+ const result=await faceapi.detectSingleFace(
+  video,new faceapi.TinyFaceDetectorOptions()
+ ).withFaceLandmarks().withFaceDescriptor();
+
+ if(!result)throw new Error('Face not detected. Look at the camera and try again.');
+
+ return Array.from(result.descriptor);
+}
+
+async function registerFace(){
+ const status=document.getElementById('faceStatus');
+ const button=document.getElementById('registerButton');
+ button.disabled=true;
+ status.textContent='Registering face...';
+
+ try{
+  faceDescriptor=await captureFace();
+
+  const result=await api({
+   action:'registerFace',
+   token,
+   descriptor:faceDescriptor
+  });
+
+  if(!result.success)throw new Error(result.message||'Registration failed');
+
+  faceVerified=true;
+  status.textContent='Face registered successfully.';
+  status.classList.remove('error');
+
+ }catch(error){
   faceVerified=false;
-  location.reload();
+  status.textContent=error.message;
+  status.classList.add('error');
+ }finally{
+  button.disabled=false;
+ }
 }
 
-function initMap() {
-  if(attendanceMap) return;
+async function scanFace(){
+ const status=document.getElementById('faceStatus');
+ const button=document.getElementById('scanButton');
+ button.disabled=true;
+ status.textContent='Scanning face...';
 
-  attendanceMap = L.map('map').setView([OFFICE.lat,OFFICE.lng],18);
+ try{
+  faceDescriptor=await captureFace();
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    attribution:'© OpenStreetMap'
-  }).addTo(attendanceMap);
+  const result=await api({
+   action:'verifyFace',
+   token,
+   descriptor:faceDescriptor
+  });
 
-  officeCircle = L.circle([OFFICE.lat,OFFICE.lng],{
-    radius:OFFICE.radius,
-    color:'#24845D',
-    fillColor:'#24845D',
-    fillOpacity:.12,
-    weight:2
-  }).addTo(attendanceMap);
+  if(!result.success)throw new Error(result.message||'Face verification failed');
 
-  // Only live location marker. No extra office pin.
+  faceVerified=true;
+  status.textContent='Face verified successfully.';
+  status.classList.remove('error');
+
+ }catch(error){
+  faceVerified=false;
+  status.textContent=error.message;
+  status.classList.add('error');
+ }finally{
+  button.disabled=false;
+ }
 }
 
-function updateLocation() {
-  const status = document.getElementById('gpsStatus');
+async function markAttendance(type){
+ const status=document.getElementById('attendanceStatus');
 
-  if(!navigator.geolocation) {
-    status.textContent='GPS not supported';
-    status.classList.add('error');
-    return;
+ if(!faceVerified){
+  status.textContent='Please register or verify your face first.';
+  return;
+ }
+
+ if(liveLat===null||liveLng===null){
+  status.textContent='Please update live GPS location first.';
+  return;
+ }
+
+ const distance=distanceMetres(
+  liveLat,liveLng,OFFICE.lat,OFFICE.lng
+ );
+
+ if(distance>OFFICE.radius){
+  status.textContent='Outside 50 metre office zone. Attendance rejected.';
+  return;
+ }
+
+ status.textContent='Submitting attendance...';
+
+ try{
+  const result=await api({
+   action:'attendance',
+   token,
+   type,
+   lat:liveLat,
+   lng:liveLng,
+   faceVerified:true
+  });
+
+  if(!result.success)throw new Error(result.message||'Attendance failed');
+
+  status.textContent=result.message||'Attendance marked successfully.';
+  await loadToday();
+  await loadHistory();
+
+ }catch(error){
+  status.textContent=error.message;
+ }
+}
+
+async function loadToday(){
+ try{
+  const result=await api({action:'today',token});
+  if(!result.success)return;
+
+  document.getElementById('inTime').textContent=result.inTime||'--:--';
+  document.getElementById('outTime').textContent=result.outTime||'--:--';
+ }catch(e){}
+}
+
+function safe(value){
+ return String(value??'').replace(/[&<>"']/g,c=>({
+  '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+ })[c]);
+}
+
+async function loadHistory(){
+ const body=document.getElementById('historyBody');
+ body.innerHTML='<tr><td colspan="4">Loading...</td></tr>';
+
+ try{
+  const result=await api({action:'history',token});
+  if(!result.success)throw new Error('History unavailable');
+
+  if(!result.history||!result.history.length){
+   body.innerHTML='<tr><td colspan="4">No records found</td></tr>';
+   return;
   }
 
-  status.textContent='Getting live GPS location...';
+  body.innerHTML=result.history.map(item=>`
+   <tr>
+    <td>${safe(item.date)}</td>
+    <td>${safe(item.inTime)}</td>
+    <td>${safe(item.outTime)}</td>
+    <td>${safe(item.status)}</td>
+   </tr>
+  `).join('');
 
-  navigator.geolocation.getCurrentPosition(position=>{
-    liveLat=position.coords.latitude;
-    liveLng=position.coords.longitude;
-
-    const distance=distanceMetres(
-      liveLat,liveLng,OFFICE.lat,OFFICE.lng
-    );
-
-    if(attendanceMap) {
-      if(liveMarker) attendanceMap.removeLayer(liveMarker);
-
-      liveMarker=L.circleMarker([liveLat,liveLng],{
-        radius:7,
-        color:'#2865C7',
-        fillColor:'#2865C7',
-        fillOpacity:1
-      }).addTo(attendanceMap);
-
-      attendanceMap.setView([OFFICE.lat,OFFICE.lng],18);
-    }
-
-    status.textContent = distance<=OFFICE.radius
-      ? 'INSIDE 50 metre office zone • '+Math.round(distance)+'m'
-      : 'OUTSIDE 50 metre office zone • '+Math.round(distance)+'m';
-
-    status.classList.toggle('error',distance>OFFICE.radius);
-
-  },error=>{
-    status.textContent='Unable to get GPS. Please allow location access.';
-    status.classList.add('error');
-  },{enableHighAccuracy:true,timeout:20000,maximumAge:0});
-}
-
-function distanceMetres(a,b,c,d) {
-  const R=6371000;
-  const rad=x=>x*Math.PI/180;
-  const x=Math.sin(rad((c-a)/2))**2+
-    Math.cos(rad(a))*Math.cos(rad(c))*
-    Math.sin(rad((d-b)/2))**2;
-  return 2*R*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
-}
-
-async function startCamera() {
-  const video=document.getElementById('camera');
-  try {
-    const stream=await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:'user'},
-      audio:false
-    });
-    video.srcObject=stream;
-    document.getElementById('faceStatus').textContent='Camera started';
-  } catch(e) {
-    document.getElementById('faceStatus').textContent='Camera permission required';
-  }
-}
-
-async function scanFace() {
-  const status=document.getElementById('faceStatus');
-  status.textContent='Loading face recognition...';
-
-  try {
-    await faceapi.nets.tinyFaceDetector.loadFromUri(
-      'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights'
-    );
-    await faceapi.nets.faceLandmark68Net.loadFromUri(
-      'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights'
-    );
-    await faceapi.nets.faceRecognitionNet.loadFromUri(
-      'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights'
-    );
-
-    const video=document.getElementById('camera');
-    const result=await faceapi.detectSingleFace(
-      video,new faceapi.TinyFaceDetectorOptions()
-    ).withFaceLandmarks().withFaceDescriptor();
-
-    if(!result) throw new Error('Face not detected. Try again.');
-
-    faceDescriptor=Array.from(result.descriptor);
-
-    const verification=await api({
-      action:'verifyFace',
-      token,
-      descriptor:faceDescriptor
-    });
-
-    if(!verification.success) {
-      faceVerified=false;
-      throw new Error('Face verification failed. Register your face first.');
-    }
-
-    faceVerified=true;
-    status.textContent='Face verified successfully';
-    status.classList.remove('error');
-
-  } catch(e) {
-    faceVerified=false;
-    status.textContent=e.message;
-    status.classList.add('error');
-  }
-}
-
-async function markAttendance(type) {
-  const status=document.getElementById('attendanceStatus');
-
-  if(!faceVerified) {
-    status.textContent='Please verify your face first';
-    return;
-  }
-
-  if(liveLat===null || liveLng===null) {
-    status.textContent='Please update GPS location first';
-    return;
-  }
-
-  status.textContent='Submitting attendance...';
-
-  try {
-    const result=await api({
-      action:'attendance',
-      token,
-      type,
-      lat:liveLat,
-      lng:liveLng,
-      faceVerified:true
-    });
-
-    if(!result.success) throw new Error(result.message);
-
-    status.textContent=result.message;
-    await loadToday();
-    await loadHistory();
-
-  } catch(e) {
-    status.textContent=e.message;
-  }
-}
-
-async function loadToday() {
-  try {
-    const result=await api({action:'today',token});
-    if(result.success) {
-      document.getElementById('inTime').textContent=result.inTime || '--:--';
-      document.getElementById('outTime').textContent=result.outTime || '--:--';
-    }
-  } catch(e) {}
-}
-
-async function loadHistory() {
-  const body=document.getElementById('historyBody');
-  try {
-    const result=await api({action:'history',token});
-    if(!result.success) throw new Error('Could not load history');
-
-    if(!result.history.length) {
-      body.innerHTML='<tr><td colspan="4">No records found</td></tr>';
-      return;
-    }
-
-    body.innerHTML=result.history.map(item=>`
-      <tr>
-        <td>${escapeHTML(item.date)}</td>
-        <td>${escapeHTML(item.inTime)}</td>
-        <td>${escapeHTML(item.outTime)}</td>
-        <td>${escapeHTML(item.status)}</td>
-      </tr>
-    `).join('');
-
-  } catch(e) {
-    body.innerHTML='<tr><td colspan="4">Unable to load history</td></tr>';
-  }
-}
-
-function escapeHTML(value) {
-  return String(value ?? '').replace(/[&<>"']/g,c=>({
-    '&':'&amp;','<':'&lt;','>':'&gt;',
-    '"':'&quot;',"'":'&#39;'
-  })[c]);
+ }catch(error){
+  body.innerHTML='<tr><td colspan="4">Unable to load history</td></tr>';
+ }
 }
 </script>
-
 </body>
 </html>
