@@ -110,7 +110,7 @@ video{width:100%;height:300px;object-fit:cover;background:#eee;border-radius:13p
 <div class="card">
 <div class="row">
 <h2>Office Location</h2>
-<span class="pill">100 METRES</span>
+<span class="pill">50 METRES</span>
 </div>
 
 <p id="gpsStatus" class="muted">GPS not checked</p>
@@ -118,7 +118,7 @@ video{width:100%;height:300px;object-fit:cover;background:#eee;border-radius:13p
 <div id="attendanceMap"></div>
 
 <div class="maplegend">
-<span><i class="legenddot" style="background:#25a55b"></i>Office 100m zone</span>
+<span><i class="legenddot" style="background:#25a55b"></i>Office 50m zone</span>
 <span><i class="legenddot" style="background:#2878d0"></i>Your live location</span>
 </div>
 
@@ -495,12 +495,12 @@ async function checkGPS(){
   if(meters<=OFFICE.radius){
    msg(
     "gpsStatus",
-    "INSIDE 100 metre office zone · "+Math.round(meters)+" metres. Face verification is required."
+    "INSIDE 50 metre office zone · "+Math.round(meters)+" metres. Face verification is required."
    );
   }else{
    msg(
     "gpsStatus",
-    "OUTSIDE 100 metre office zone · "+Math.round(meters)+" metres from office. Attendance will be rejected."
+    "OUTSIDE 500 metre office zone · "+Math.round(meters)+" metres from office. Attendance will be rejected."
    );
   }
 
