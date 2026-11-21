@@ -301,11 +301,19 @@ function initMap(){
 }
 
 function distanceMetres(a,b,c,d){
- const R=6371000;
- const rad=x=>x*Math.PI/180;
- const v=Math.sin(rad(c-a)/2)**2+
- Math.cos(rad(a)*Math.cos(rad(c))*Math.sin(rad(d-b)/2)**2;
- return 2*R*Math.atan2(Math.sqrt(v),Math.sqrt(1-v));
+  const R = 6371000;
+  const rad = x => x * Math.PI / 180;
+
+  const x =
+    Math.sin(rad(c-a)/2)**2 +
+    Math.cos(rad(a)) *
+    Math.cos(rad(c)) *
+    Math.sin(rad(d-b)/2)**2;
+
+  return 2 * R * Math.atan2(
+    Math.sqrt(x),
+    Math.sqrt(1-x)
+  );
 }
 
 function updateLocation(){
