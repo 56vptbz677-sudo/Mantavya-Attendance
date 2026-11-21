@@ -11,33 +11,16 @@
 
 <style>
 *{box-sizing:border-box}
-body{
- margin:0;background:#F7F3EA;color:#2B2B2B;
- font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif
-}
-header{
- background:#fff;padding:20px;text-align:center;
- border-bottom:2px solid #C89B3C
-}
+body{margin:0;background:#F7F3EA;color:#2B2B2B;font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif}
+header{background:#fff;padding:20px;text-align:center;border-bottom:2px solid #C89B3C}
 header h1{margin:0;font-size:23px;letter-spacing:1px}
 header p{margin:5px 0 0;color:#A17B32;font-size:11px;letter-spacing:3px}
 main{max-width:520px;margin:auto;padding:14px}
-.card{
- background:#fff;border:1px solid #E8E0D0;
- border-radius:18px;padding:18px;margin:13px 0;
- box-shadow:0 3px 14px rgba(43,43,43,.05)
-}
+.card{background:#fff;border:1px solid #E8E0D0;border-radius:18px;padding:18px;margin:13px 0;box-shadow:0 3px 14px rgba(43,43,43,.05)}
 h2{font-size:19px;margin:0 0 14px}
 h3{font-size:14px;color:#92702F}
-input{
- width:100%;padding:14px;margin:7px 0;
- border:1px solid #DDD4C2;border-radius:10px;
- background:#FAF9F6;color:#2B2B2B;font-size:16px
-}
-button{
- border:0;border-radius:11px;padding:14px;
- font-size:14px;font-weight:700;cursor:pointer
-}
+input{width:100%;padding:14px;margin:7px 0;border:1px solid #DDD4C2;border-radius:10px;background:#FAF9F6;color:#2B2B2B;font-size:16px}
+button{border:0;border-radius:11px;padding:14px;font-size:14px;font-weight:700;cursor:pointer}
 button:disabled{opacity:.5}
 .full{width:100%}
 .gold{background:#C89B3C;color:white}
@@ -46,17 +29,14 @@ button:disabled{opacity:.5}
 .outbtn{background:#8B4545;color:white}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .timegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.timebox{background:#F7F3EA;padding:14px;border-radius:12px}
+.timebox{background:#F7F3EA;padding:14px;border-radius:12px;min-width:0}
 .timebox strong{display:block;color:#92702F;font-size:12px}
-.timebox span{display:block;font-size:22px;font-weight:700;margin-top:7px}
-video{
- width:100%;height:300px;object-fit:cover;
- background:#eee;border-radius:13px;transform:scaleX(-1)
-}
+.timebox span{display:block;font-size:22px;font-weight:700;margin-top:7px;white-space:nowrap}
+video{width:100%;height:300px;object-fit:cover;background:#eee;border-radius:13px;transform:scaleX(-1)}
 .status{font-size:13px;color:#806125;line-height:1.5;white-space:pre-wrap}
 .muted{font-size:13px;color:#777064;line-height:1.5}
-.record{padding:12px 0;border-bottom:1px solid #E9E1D2;font-size:13px}
-.pill{background:#F1E8D5;color:#806125;padding:6px 10px;border-radius:20px;font-size:11px}
+.record{padding:12px 0;border-bottom:1px solid #E9E1D2;font-size:13px;line-height:1.6}
+.pill{background:#F1E8D5;color:#806125;padding:6px 10px;border-radius:20px;font-size:11px;white-space:nowrap}
 .row{display:flex;justify-content:space-between;align-items:center;gap:10px}
 #app,#profileCard,#adminCard{display:none}
 .nav{display:flex;gap:8px;margin:12px 0}
@@ -110,8 +90,7 @@ video{
 </div>
 
 <video id="video" autoplay muted playsinline></video>
-
-<p id="faceStatus" class="status">Starting camera...</p>
+<p id="faceStatus" class="status">Camera starting...</p>
 
 <button class="full soft" id="scanButton" onclick="scanFace()">SCAN FACE</button>
 
@@ -149,8 +128,11 @@ video{
 <section id="profileCard" class="card">
 <h2>Profile & Settings</h2>
 <h3>Face Registration</h3>
+<p class="muted">Register once without glasses and again with glasses to save multiple face samples.</p>
 <button class="full gold" onclick="registerFace()">REGISTER / UPDATE FACE</button>
+
 <hr style="border:0;border-top:1px solid #E9E1D2;margin:18px 0">
+
 <h3>Change Password</h3>
 <input id="oldPassword" type="password" placeholder="Current password">
 <input id="newPassword" type="password" placeholder="New password">
@@ -197,41 +179,66 @@ function msg(id,value){
 async function login(){
  const id=document.getElementById("employeeId").value.trim();
  const pass=document.getElementById("password").value;
-
  msg("loginStatus","Logging in...");
 
  try{
-  const r=await api({
-   action:"login",
-   employeeId:id,
-   password:pass
-  });
-
+  const r=await api({action:"login",employeeId:id,password:pass});
   if(!r.success)throw new Error(r.message);
 
   token=r.token;
   employee=r.name;
 
-  document.getElementById("login").style.display="none";
-  document.getElementById("app").style.display="block";
-  document.getElementById("welcome").textContent="Welcome, "+employee;
-  document.getElementById("employeeInfo").textContent=r.employeeId;
+  sessionStorage.setItem("mn_token",token);
+  sessionStorage.setItem("mn_name",employee);
+  sessionStorage.setItem("mn_id",r.employeeId);
 
-  if(r.isAdmin){
-   document.getElementById("adminNav").style.display="block";
-  }
-
-  loadHistory();
-
-  if(r.mustChangePassword){
-   alert("Please change your password in Profile.");
-   showProfile();
-  }
-
-  startCamera();
+  showApp(r);
 
  }catch(e){
   msg("loginStatus",e.message);
+ }
+}
+
+function showApp(user){
+ document.getElementById("login").style.display="none";
+ document.getElementById("app").style.display="block";
+ document.getElementById("welcome").textContent="Welcome, "+employee;
+ document.getElementById("employeeInfo").textContent=user.employeeId||sessionStorage.getItem("mn_id")||"";
+
+ if(user.isAdmin||sessionStorage.getItem("mn_id")==="MN001"){
+  document.getElementById("adminNav").style.display="block";
+ }
+
+ loadHistory();
+
+ if(user.mustChangePassword){
+  alert("Please change your password in Profile.");
+  showProfile();
+ }
+
+ startCamera();
+}
+
+async function restoreSession(){
+ const saved=sessionStorage.getItem("mn_token");
+ if(!saved)return;
+
+ token=saved;
+ employee=sessionStorage.getItem("mn_name")||"";
+
+ try{
+  const r=await api({action:"myAttendance",token:token});
+  if(!r.success)throw new Error(r.message);
+
+  showApp({
+   employeeId:sessionStorage.getItem("mn_id"),
+   isAdmin:sessionStorage.getItem("mn_id")==="MN001"
+  });
+
+ }catch(e){
+  sessionStorage.clear();
+  token="";
+  employee="";
  }
 }
 
@@ -239,7 +246,7 @@ async function startCamera(){
  try{
   msg("faceStatus","Opening front camera...");
 
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
    throw new Error("Camera not supported in this browser.");
   }
 
@@ -259,14 +266,12 @@ async function startCamera(){
   await video.play();
 
   msg("faceStatus","Camera ready. Loading face recognition...");
-
   await loadModels();
 
   msg("faceStatus","Camera ready. Press SCAN FACE.");
 
  }catch(e){
-  msg("faceStatus","Camera error: "+e.message+
-  ". Allow camera permission and refresh.");
+  msg("faceStatus","Camera error: "+e.message+". Allow camera permission and refresh.");
  }
 }
 
@@ -294,7 +299,7 @@ async function captureFace(){
   .withFaceLandmarks()
   .withFaceDescriptor();
 
- if(!result)throw new Error("Face not detected. Look at camera.");
+ if(!result)throw new Error("Face not detected. Look at camera with good lighting.");
 
  return Array.from(result.descriptor);
 }
@@ -326,6 +331,7 @@ async function scanFace(){
 
  }catch(e){
   msg("faceStatus",e.message);
+
  }finally{
   btn.disabled=false;
   faceBusy=false;
@@ -345,8 +351,8 @@ async function registerFace(){
   if(!r.success)throw new Error(r.message);
 
   faceVerified=true;
-  msg("faceStatus","Face registered successfully.");
-  alert("Face registered successfully.");
+  msg("faceStatus",r.message||"Face registered successfully.");
+  alert(r.message||"Face registered successfully.");
 
  }catch(e){
   msg("faceStatus",e.message);
@@ -375,16 +381,15 @@ async function checkGPS(){
   msg("gpsStatus","Checking GPS...");
   gps=await getGPS();
 
-  msg("gpsStatus","GPS captured successfully.");
+  msg("gpsStatus","GPS captured successfully. Attendance will check the 100 metre office radius.");
+
  }catch(e){
   msg("gpsStatus",e.message);
  }
 }
 
 async function markAttendance(action){
- const btn=document.getElementById(
-  action==="IN"?"inButton":"outButton"
- );
+ const btn=document.getElementById(action==="IN"?"inButton":"outButton");
 
  try{
   if(!faceVerified){
@@ -395,7 +400,6 @@ async function markAttendance(action){
   msg("status","Checking GPS and verifying attendance...");
 
   gps=await getGPS();
-
   const descriptor=await captureFace();
 
   const r=await api({
@@ -410,18 +414,33 @@ async function markAttendance(action){
   if(!r.success)throw new Error(r.message);
 
   faceVerified=false;
-
   msg("status",r.message+" | "+r.time);
 
   await loadHistory();
-
   alert(action+" recorded successfully.");
 
  }catch(e){
   msg("status",e.message);
+
  }finally{
   btn.disabled=false;
  }
+}
+
+function formatAttendanceTime(value){
+ if(!value)return "--:--";
+
+ const match=String(value).match(/(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?/i);
+ if(!match)return String(value);
+
+ let hour=Number(match[1]);
+ const minute=match[2];
+ let suffix=(match[4]||"").toUpperCase();
+
+ if(!suffix)suffix=hour>=12?"PM":"AM";
+ if(!match[4])hour=hour%12||12;
+
+ return String(hour).padStart(2,"0")+":"+minute+" "+suffix;
 }
 
 async function loadHistory(){
@@ -433,10 +452,13 @@ async function loadHistory(){
 
   if(!r.success)throw new Error(r.message);
 
+  document.getElementById("inTime").textContent=formatAttendanceTime(r.todayIn);
+  document.getElementById("outTime").textContent=formatAttendanceTime(r.todayOut);
+
   const box=document.getElementById("history");
   box.innerHTML="";
 
-  if(!r.records || !r.records.length){
+  if(!r.records||!r.records.length){
    box.textContent="No attendance records.";
    return;
   }
@@ -444,7 +466,7 @@ async function loadHistory(){
   r.records.forEach(row=>{
    const div=document.createElement("div");
    div.className="record";
-   div.textContent=row.join(" | ");
+   div.textContent=row.map(v=>v==null?"":String(v)).join(" | ");
    box.appendChild(div);
   });
 
@@ -465,7 +487,7 @@ async function loadAdmin(){
   const box=document.getElementById("adminData");
   box.innerHTML="";
 
-  r.records.forEach(row=>{
+  (r.records||[]).forEach(row=>{
    const div=document.createElement("div");
    div.className="record";
    div.textContent=row.join(" | ");
@@ -496,6 +518,7 @@ async function changePassword(){
   if(!r.success)throw new Error(r.message);
 
   alert("Password changed successfully.");
+
   document.getElementById("oldPassword").value="";
   document.getElementById("newPassword").value="";
 
@@ -528,8 +551,11 @@ async function logout(){
   stream.getTracks().forEach(t=>t.stop());
  }
 
+ sessionStorage.clear();
  location.reload();
 }
+
+window.addEventListener("load",restoreSession);
 </script>
 </body>
 </html>
