@@ -7,6 +7,8 @@
 <meta name="theme-color" content="#F7F3EA">
 <title>Mantavya News Attendance</title>
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 
 <style>
@@ -32,6 +34,9 @@ button:disabled{opacity:.5}
 .timebox{background:#F7F3EA;padding:14px;border-radius:12px;min-width:0}
 .timebox strong{display:block;color:#92702F;font-size:12px}
 .timebox span{display:block;font-size:22px;font-weight:700;margin-top:7px;white-space:nowrap}
+#attendanceMap{width:100%;height:280px;border-radius:13px;overflow:hidden;background:#eee}
+.maplegend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:#777064;margin:8px 0}
+.legenddot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
 video{width:100%;height:300px;object-fit:cover;background:#eee;border-radius:13px;transform:scaleX(-1)}
 .status{font-size:13px;color:#806125;line-height:1.5;white-space:pre-wrap}
 .muted{font-size:13px;color:#777064;line-height:1.5}
@@ -107,8 +112,17 @@ video{width:100%;height:300px;object-fit:cover;background:#eee;border-radius:13p
 <h2>Office Location</h2>
 <span class="pill">100 METRES</span>
 </div>
+
 <p id="gpsStatus" class="muted">GPS not checked</p>
-<button class="full soft" onclick="checkGPS()">CHECK GPS</button>
+
+<div id="attendanceMap"></div>
+
+<div class="maplegend">
+<span><i class="legenddot" style="background:#25a55b"></i>Office 100m zone</span>
+<span><i class="legenddot" style="background:#2878d0"></i>Your live location</span>
+</div>
+
+<button class="full soft" onclick="checkGPS()">UPDATE LIVE LOCATION</button>
 </div>
 
 <div class="card">
@@ -148,7 +162,6 @@ video{width:100%;height:300px;object-fit:cover;background:#eee;border-radius:13p
 </section>
 
 </section>
-
 <p id="status" class="status"></p>
 </main>
 
@@ -163,6 +176,16 @@ let gps=null;
 let modelsReady=false;
 let faceVerified=false;
 let faceBusy=false;
+
+let attendanceMap=null;
+let liveMarker=null;
+let officeCircle=null;
+
+const OFFICE={
+ lat:23.045533,
+ lng:72.552006,
+ radius:100
+};
 
 async function api(data){
  const response=await fetch(API,{
@@ -179,10 +202,16 @@ function msg(id,value){
 async function login(){
  const id=document.getElementById("employeeId").value.trim();
  const pass=document.getElementById("password").value;
+
  msg("loginStatus","Logging in...");
 
  try{
-  const r=await api({action:"login",employeeId:id,password:pass});
+  const r=await api({
+   action:"login",
+   employeeId:id,
+   password:pass
+  });
+
   if(!r.success)throw new Error(r.message);
 
   token=r.token;
@@ -202,14 +231,17 @@ async function login(){
 function showApp(user){
  document.getElementById("login").style.display="none";
  document.getElementById("app").style.display="block";
+
  document.getElementById("welcome").textContent="Welcome, "+employee;
- document.getElementById("employeeInfo").textContent=user.employeeId||sessionStorage.getItem("mn_id")||"";
+ document.getElementById("employeeInfo").textContent=
+  user.employeeId||sessionStorage.getItem("mn_id")||"";
 
  if(user.isAdmin||sessionStorage.getItem("mn_id")==="MN001"){
   document.getElementById("adminNav").style.display="block";
  }
 
  loadHistory();
+ setTimeout(initAttendanceMap,350);
 
  if(user.mustChangePassword){
   alert("Please change your password in Profile.");
@@ -227,7 +259,11 @@ async function restoreSession(){
  employee=sessionStorage.getItem("mn_name")||"";
 
  try{
-  const r=await api({action:"myAttendance",token:token});
+  const r=await api({
+   action:"myAttendance",
+   token:token
+  });
+
   if(!r.success)throw new Error(r.message);
 
   showApp({
@@ -299,7 +335,9 @@ async function captureFace(){
   .withFaceLandmarks()
   .withFaceDescriptor();
 
- if(!result)throw new Error("Face not detected. Look at camera with good lighting.");
+ if(!result){
+  throw new Error("Face not detected. Look at camera with good lighting.");
+ }
 
  return Array.from(result.descriptor);
 }
@@ -376,12 +414,95 @@ async function getGPS(){
  });
 }
 
+function initAttendanceMap(){
+ if(attendanceMap||!window.L)return;
+
+ attendanceMap=L.map("attendanceMap").setView(
+  [OFFICE.lat,OFFICE.lng],18
+ );
+
+ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
+  maxZoom:19,
+  attribution:'&copy; OpenStreetMap contributors'
+ }).addTo(attendanceMap);
+
+ L.marker([OFFICE.lat,OFFICE.lng])
+  .addTo(attendanceMap)
+  .bindPopup("Mantavya News Office");
+
+ officeCircle=L.circle(
+  [OFFICE.lat,OFFICE.lng],
+  {
+   radius:OFFICE.radius,
+   color:"#168a45",
+   weight:2,
+   fillColor:"#25a55b",
+   fillOpacity:0.20
+  }
+ ).addTo(attendanceMap);
+
+ setTimeout(()=>attendanceMap.invalidateSize(),250);
+}
+
+function distanceFromOffice(lat,lng){
+ const rad=n=>n*Math.PI/180;
+ const R=6371000;
+
+ const dLat=rad(lat-OFFICE.lat);
+ const dLng=rad(lng-OFFICE.lng);
+
+ const a=Math.sin(dLat/2)**2+
+  Math.cos(rad(OFFICE.lat))*
+  Math.cos(rad(lat))*
+  Math.sin(dLng/2)**2;
+
+ return 2*R*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
 async function checkGPS(){
  try{
-  msg("gpsStatus","Checking GPS...");
-  gps=await getGPS();
+  msg("gpsStatus","Checking live GPS...");
 
-  msg("gpsStatus","GPS captured successfully. Attendance will check the 100 metre office radius.");
+  gps=await getGPS();
+  initAttendanceMap();
+
+  const meters=distanceFromOffice(gps.lat,gps.lng);
+
+  if(liveMarker){
+   liveMarker.setLatLng([gps.lat,gps.lng]);
+  }else{
+   liveMarker=L.circleMarker(
+    [gps.lat,gps.lng],
+    {
+     radius:8,
+     color:"#155da8",
+     fillColor:"#2878d0",
+     fillOpacity:1,
+     weight:2
+    }
+   ).addTo(attendanceMap);
+  }
+
+  attendanceMap.fitBounds(
+   officeCircle.getBounds(),
+   {padding:[18,18]}
+  );
+
+  liveMarker.bindPopup(
+   "Your live location · "+Math.round(meters)+" metres from office"
+  );
+
+  if(meters<=OFFICE.radius){
+   msg(
+    "gpsStatus",
+    "INSIDE 100 metre office zone · "+Math.round(meters)+" metres. Face verification is required."
+   );
+  }else{
+   msg(
+    "gpsStatus",
+    "OUTSIDE 100 metre office zone · "+Math.round(meters)+" metres from office. Attendance will be rejected."
+   );
+  }
 
  }catch(e){
   msg("gpsStatus",e.message);
@@ -389,7 +510,9 @@ async function checkGPS(){
 }
 
 async function markAttendance(action){
- const btn=document.getElementById(action==="IN"?"inButton":"outButton");
+ const btn=document.getElementById(
+  action==="IN"?"inButton":"outButton"
+ );
 
  try{
   if(!faceVerified){
@@ -400,6 +523,7 @@ async function markAttendance(action){
   msg("status","Checking GPS and verifying attendance...");
 
   gps=await getGPS();
+
   const descriptor=await captureFace();
 
   const r=await api({
@@ -414,6 +538,7 @@ async function markAttendance(action){
   if(!r.success)throw new Error(r.message);
 
   faceVerified=false;
+
   msg("status",r.message+" | "+r.time);
 
   await loadHistory();
@@ -430,7 +555,10 @@ async function markAttendance(action){
 function formatAttendanceTime(value){
  if(!value)return "--:--";
 
- const match=String(value).match(/(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?/i);
+ const match=String(value).match(
+  /(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?/i
+ );
+
  if(!match)return String(value);
 
  let hour=Number(match[1]);
@@ -452,8 +580,11 @@ async function loadHistory(){
 
   if(!r.success)throw new Error(r.message);
 
-  document.getElementById("inTime").textContent=formatAttendanceTime(r.todayIn);
-  document.getElementById("outTime").textContent=formatAttendanceTime(r.todayOut);
+  document.getElementById("inTime").textContent=
+   formatAttendanceTime(r.todayIn);
+
+  document.getElementById("outTime").textContent=
+   formatAttendanceTime(r.todayOut);
 
   const box=document.getElementById("history");
   box.innerHTML="";
